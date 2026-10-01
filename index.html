@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="A three-step home service ads calculator for funnel rates, lead costs, profit, ROI and break-even." />
+  <title>Home Service ROI Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #e8edf2;
+      --surface: #fdfefe;
+      --surface-2: #f1f5f7;
+      --ink: #121923;
+      --ink-2: #3d4a59;
+      --ink-3: #687687;
+      --line: #cbd5df;
+      --line-bright: #ffffff;
+      --copper: #c46024;
+      --copper-ink: #8b3e10;
+      --copper-soft: #fae8d9;
+      --pos: #087a55;
+      --pos-soft: #d9f2e8;
+      --neg: #bd3b35;
+      --neg-soft: #f9e3e1;
+      --water: #087f9c;
+      --water-deep: #075f78;
+      --water-soft: #d9f2f7;
+      --shadow: 0 22px 55px rgba(25, 40, 56, .11), 0 2px 8px rgba(25, 40, 56, .07);
+      --shadow-soft: 0 10px 28px rgba(25, 40, 56, .08);
+      --radius: 16px;
+      --font-display: "Archivo", "IBM Plex Sans", system-ui, sans-serif;
+      --font-body: "IBM Plex Sans", system-ui, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #070c12;
+        --surface: #101821;
+        --surface-2: #151f2a;
+        --ink: #f4f7fa;
+        --ink-2: #bdc8d3;
+        --ink-3: #8292a4;
+        --line: #273849;
+        --line-bright: #3d5164;
+        --copper: #f08a42;
+        --copper-ink: #ffae70;
+        --copper-soft: rgba(240,138,66,.14);
+        --pos: #61d39a;
+        --pos-soft: rgba(54,198,132,.13);
+        --neg: #ff8275;
+        --neg-soft: rgba(239,90,77,.14);
+        --water: #35bddc;
+        --water-deep: #8be6f7;
+        --water-soft: rgba(43,180,210,.15);
+        --shadow: 0 24px 70px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.025);
+        --shadow-soft: 0 12px 34px rgba(0,0,0,.28);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--water) 10%, transparent) 0, transparent 32rem),
+        radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--copper) 9%, transparent) 0, transparent 27rem),
+        var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 var(--font-body);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--line) 46%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--line) 46%, transparent) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, #000, transparent 68%);
+    }
+    button, input, select { font: inherit; }
+    ::selection { background: var(--copper-soft); }
+    .page { max-width: 1220px; margin: 0 auto; padding: 38px 20px 64px; }
+
+    .intro {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .intro-copy { max-width: 790px; }
+    .intro h1 {
+      margin: 0 0 12px;
+      font: 900 clamp(1.95rem, 4.6vw, 3rem)/1.04 var(--font-display);
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+    .intro h1 span { color: var(--copper); }
+    .lede { margin: 0; color: var(--ink-2); font-size: clamp(1rem, 2vw, 1.12rem); max-width: 44rem; }
+    .intro-actions {
+      display: flex;
+      flex: 0 0 auto;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin-top: 5px;
+    }
+    .video-guide {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 2px;
+      color: var(--ink-2);
+      font-size: .84rem;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .video-guide svg { width: 27px; height: 19px; flex: 0 0 auto; }
+    .video-guide .yt-body { fill: #e62117; }
+    .video-guide .yt-play { fill: #fff; }
+    .video-guide .linkedin-body { fill: #0a66c2; }
+    .video-guide .linkedin-mark { fill: #fff; }
+    .video-guide:hover { color: var(--ink); }
+    .video-guide:focus-visible { outline: 2px solid var(--copper); outline-offset: 4px; border-radius: 4px; }
+    @media (max-width: 720px) {
+      .intro { flex-direction: column; gap: 11px; }
+      .intro-actions { margin-top: 0; }
+    }
+    .rule {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 26px 0 16px;
+      padding: 13px 15px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      box-shadow: var(--shadow-soft);
+      color: var(--ink-2);
+      font-size: .94rem;
+    }
+    .rule::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: var(--copper);
+      box-shadow: 0 0 16px var(--copper);
+    }
+    .rule-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid color-mix(in srgb, var(--copper) 45%, transparent);
+      border-radius: 50%;
+      background: var(--copper-soft);
+      color: var(--copper-ink);
+      box-shadow: 0 0 18px color-mix(in srgb, var(--copper) 22%, transparent);
+      font-weight: 800;
+    }
+    .rule b { color: var(--ink); }
+
+    .currency-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin: 0 0 20px;
+      padding: 12px 14px 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      box-shadow: var(--shadow-soft);
+    }
+    .currency-copy strong { display: block; font-size: .9rem; }
+    .currency-copy span { display: block; margin-top: 2px; color: var(--ink-3); font-size: .77rem; }
+    .currency-select {
+      min-width: 142px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px 34px 9px 11px;
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .currency-select:focus-visible { border-color: var(--copper); outline: 2px solid var(--copper-soft); }
+
+    .quick {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 0 -20px 18px;
+      padding: 10px 20px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(8,18,28,.09);
+      backdrop-filter: blur(14px);
+      font-variant-numeric: tabular-nums;
+    }
+    .quick span { color: var(--ink-3); font-size: .7rem; }
+    .quick b { display: block; color: var(--ink); font: 800 1rem/1.2 var(--font-display); }
+    .quick b.good { color: var(--pos); }
+    .quick b.bad { color: var(--neg); }
+    @media (min-width: 900px) { .quick { display: none; } }
+
+    .moves { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
+    @media (min-width: 980px) { .moves { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .move {
+      --card-accent: var(--copper);
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-top-color: color-mix(in srgb, var(--card-accent) 58%, var(--line));
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 97%, transparent);
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
+      transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+    }
+    .move:nth-child(2) { --card-accent: var(--water); }
+    .move:nth-child(3) { --card-accent: var(--pos); }
+    .move::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      z-index: 2;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent) 18%, var(--card-accent) 82%, transparent);
+      box-shadow: 0 0 18px color-mix(in srgb, var(--card-accent) 62%, transparent);
+      opacity: .78;
+    }
+    .move::after {
+      content: "";
+      position: absolute;
+      top: 20px;
+      right: 18px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--card-accent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--card-accent) 12%, transparent), 0 0 14px var(--card-accent);
+      opacity: .7;
+    }
+    .move:hover { border-color: color-mix(in srgb, var(--card-accent) 42%, var(--line)); box-shadow: 0 28px 65px rgba(13,28,42,.16), 0 0 32px color-mix(in srgb, var(--card-accent) 9%, transparent); transform: translateY(-2px); }
+    .move-head {
+      padding: 22px 22px 17px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--card-accent) 7%, var(--surface)), var(--surface) 56%);
+    }
+    .move-label { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding-right: 20px; }
+    .step {
+      display: grid;
+      place-items: center;
+      width: 31px;
+      height: 31px;
+      border: 1px solid color-mix(in srgb, var(--card-accent) 74%, #fff);
+      border-radius: 9px;
+      background: var(--card-accent);
+      box-shadow: 0 5px 18px color-mix(in srgb, var(--card-accent) 28%, transparent);
+      color: #fff;
+      font: 800 .9rem/1 var(--font-display);
+    }
+    @media (prefers-color-scheme: dark) { .step { color: #071018; } }
+    .move h2 { margin: 0; font: 800 1.22rem/1.2 var(--font-display); letter-spacing: -.01em; }
+    .move-head p { margin: 0; color: var(--ink-2); font-size: .9rem; }
+    .move-body { padding: 19px 22px 22px; }
+    .move.is-calculating { z-index: 3; animation: cardWork .44s cubic-bezier(.2,.8,.25,1); }
+    .move.is-calculating::after { animation: statusBlink .44s ease both; }
+    .move.is-calculating .calc-box { animation: resultLight .55s ease both; }
+    @keyframes cardWork {
+      0% { transform: translateX(0); }
+      18% { transform: translateX(-2px) rotate(-.12deg); }
+      38% { transform: translateX(2px) rotate(.12deg); }
+      58% { transform: translateX(-1px); }
+      78% { transform: translateX(1px); }
+      100% { transform: translateX(0); }
+    }
+    @keyframes statusBlink {
+      0%, 100% { opacity: .7; transform: scale(1); }
+      42% { opacity: 1; transform: scale(1.65); box-shadow: 0 0 0 7px color-mix(in srgb, var(--card-accent) 12%, transparent), 0 0 24px var(--card-accent); }
+    }
+    @keyframes resultLight {
+      0%, 100% { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--line-bright) 58%, transparent); }
+      45% { border-color: color-mix(in srgb, var(--card-accent) 65%, var(--line)); box-shadow: inset 0 1px 0 var(--line-bright), 0 0 24px color-mix(in srgb, var(--card-accent) 20%, transparent); }
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--ink-3);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .field { padding: 10px 0 12px; border-top: 1px solid var(--line); }
+    .field.first { border-top: 0; padding-top: 0; }
+    .field-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .field label { color: var(--ink); font-size: .92rem; font-weight: 600; }
+    .hint { margin: 5px 0 0; color: var(--ink-3); font-size: .79rem; line-height: 1.38; }
+    .num-wrap {
+      display: flex;
+      align-items: center;
+      min-width: 92px;
+      background: color-mix(in srgb, var(--surface-2) 88%, var(--surface));
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--line-bright) 68%, transparent);
+      padding: 0 5px;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .num-wrap:focus-within {
+      border-color: var(--card-accent, var(--copper));
+      outline: 0;
+      background: var(--surface);
+      box-shadow: inset 0 1px 0 var(--line-bright), 0 0 0 3px color-mix(in srgb, var(--card-accent, var(--copper)) 15%, transparent), 0 0 18px color-mix(in srgb, var(--card-accent, var(--copper)) 10%, transparent);
+    }
+    .num-wrap .unit { color: var(--ink-3); font-size: .88rem; padding-left: 5px; }
+    .currency-symbol { white-space: nowrap; }
+    .num-wrap .unit.tail { padding: 0 5px 0 1px; }
+    .num-wrap input {
+      width: 76px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font-weight: 700;
+      text-align: right;
+      padding: 9px 4px;
+      font-variant-numeric: tabular-nums;
+      -moz-appearance: textfield;
+    }
+    .num-wrap input::-webkit-inner-spin-button,
+    .num-wrap input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .calc-box {
+      position: relative;
+      margin-top: 17px;
+      padding: 15px;
+      overflow: hidden;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--card-accent, var(--copper)) 7%, var(--surface-2)), var(--surface-2) 46%);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      box-shadow: inset 0 1px 0 color-mix(in srgb, var(--line-bright) 55%, transparent);
+    }
+    .calc-box::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 54px;
+      height: 1px;
+      background: var(--card-accent, var(--copper));
+      box-shadow: 0 0 14px var(--card-accent, var(--copper));
+    }
+    .calc-box .eyebrow { margin-bottom: 8px; color: var(--card-accent, var(--copper)); }
+    .metric { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); }
+    .metric:first-of-type { border-top: 0; }
+    .metric span { color: var(--ink-2); font-size: .86rem; }
+    .metric b { white-space: nowrap; font: 800 .98rem/1.2 var(--font-display); font-variant-numeric: tabular-nums; }
+    .metric b.good { color: var(--pos); }
+    .metric b.bad { color: var(--neg); }
+    .formula { display: block; margin-top: 2px; color: var(--ink-3); font-size: .7rem; font-weight: 400; }
+    .insight { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: .82rem; }
+    .insight b { color: var(--ink); }
+    .warning { margin: 12px 0 0; padding: 9px 10px; border-radius: 8px; background: var(--neg-soft); color: var(--neg); font-size: .8rem; }
+    .funnel-launch {
+      width: 100%;
+      margin-top: 12px;
+      border: 1px solid color-mix(in srgb, var(--water) 45%, var(--line));
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: var(--water-soft);
+      color: var(--water-deep);
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 800;
+    }
+    .funnel-launch:hover { border-color: var(--water); }
+    .funnel-launch:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
+
+    .margin-help { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+    .help-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: var(--copper-soft);
+      color: var(--copper-ink);
+      cursor: pointer;
+      font-size: .86rem;
+      font-weight: 700;
+      text-align: left;
+    }
+    .help-toggle::after { content: "+"; font-size: 1.1rem; font-weight: 500; }
+    .help-toggle[aria-expanded="true"]::after { content: "−"; }
+    .help-toggle:focus-visible, .btn:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+    .helper { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); }
+    .helper[hidden] { display: none; }
+    .helper-intro { margin: 0 0 10px; color: var(--ink-2); font-size: .8rem; }
+    .helper .field { padding: 8px 0; }
+    .helper-result { margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); }
+    .helper-result strong { display: block; color: var(--copper-ink); font: 800 1.25rem/1.2 var(--font-display); }
+    .helper-result span { color: var(--ink-3); font-size: .76rem; }
+    .btn {
+      width: 100%;
+      margin-top: 9px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 10px 12px;
+      cursor: pointer;
+      background: var(--copper);
+      color: #fff;
+      font-weight: 700;
+      font-size: .86rem;
+    }
+    @media (prefers-color-scheme: dark) { .btn { color: #181009; } }
+    .btn:disabled { cursor: not-allowed; opacity: .45; }
+
+    .funnel-visual {
+      margin-top: 20px;
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--water) 28%, var(--line));
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 97%, transparent);
+      box-shadow: var(--shadow);
+    }
+    .funnel-visual[hidden] { display: none; }
+    .funnel-visual-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .funnel-visual-head h2 { margin: 0; font: 800 1.18rem/1.2 var(--font-display); }
+    .funnel-visual-head p { margin: 5px 0 0; color: var(--ink-2); font-size: .88rem; }
+    .replay {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 9px 12px;
+      background: var(--surface-2);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .replay:hover { border-color: var(--water); }
+    .replay:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
+    .funnel-visual-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+      gap: 24px;
+      padding: 22px;
+      align-items: center;
+    }
+    .funnel-stack { min-width: 0; padding: 4px 0; }
+    .funnel-stage-wrap { display: grid; place-items: center; }
+    .funnel-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: var(--stage-width);
+      min-width: 210px;
+      min-height: 54px;
+      overflow: hidden;
+      padding: 10px clamp(20px, 5vw, 46px);
+      clip-path: polygon(2% 0, 98% 0, 94% 100%, 6% 100%);
+      background: color-mix(in srgb, var(--water-soft) 62%, var(--surface-2));
+      color: var(--ink);
+      filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--water) 28%, transparent));
+    }
+    .funnel-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--water-soft);
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    .funnel-stage span { min-width: 0; font-size: .8rem; font-weight: 600; }
+    .funnel-stage b { white-space: nowrap; color: var(--water-deep); font: 900 1.15rem/1 var(--font-display); }
+    .funnel-joint {
+      position: relative;
+      height: 48px;
+      display: grid;
+      place-items: center;
+    }
+    .funnel-joint::before {
+      content: "";
+      width: 4px;
+      height: 100%;
+      border-radius: 4px;
+      background: var(--water);
+      opacity: .7;
+    }
+    .leak-drop {
+      position: absolute;
+      left: calc(50% + 12px);
+      top: 9px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--neg);
+      font-size: .77rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .drop-shape {
+      width: 14px;
+      height: 14px;
+      border-radius: 50% 50% 50% 10%;
+      background: var(--neg);
+      transform: rotate(-45deg);
+    }
+    .leak-drop.big {
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: var(--neg-soft);
+      font-weight: 800;
+    }
+    .funnel-explain h3 { margin: 0 0 5px; font: 800 1rem/1.2 var(--font-display); }
+    .funnel-explain > p { margin: 0 0 14px; color: var(--ink-2); font-size: .84rem; }
+    .leak-list { display: grid; gap: 8px; }
+    .leak-row {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface-2);
+    }
+    .leak-row::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--water); }
+    .leak-row span { min-width: 0; color: var(--ink-2); font-size: .78rem; }
+    .leak-row b { white-space: nowrap; font: 800 .86rem/1.2 var(--font-display); }
+    .leak-row.big { border-color: color-mix(in srgb, var(--neg) 48%, var(--line)); background: var(--neg-soft); }
+    .leak-row.big::before { background: var(--neg); }
+    .leak-row.big b { color: var(--neg); }
+    .funnel-verdict {
+      margin-top: 12px;
+      padding: 11px 12px;
+      border-radius: 9px;
+      background: var(--copper-soft);
+      color: var(--copper-ink);
+      font-size: .82rem;
+    }
+    .funnel-verdict b { color: inherit; }
+    .funnel-visual.is-playing .funnel-stage::before { animation: waterFill .72s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--delay); }
+    .funnel-visual.is-playing .leak-drop { animation: drip .72s ease-out both; animation-delay: var(--delay); }
+    .funnel-visual.is-playing .leak-row { animation: leakPulse .55s ease-out both; animation-delay: var(--delay); }
+    @keyframes waterFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes drip { 0% { opacity: 0; transform: translateY(-8px); } 55% { opacity: 1; } 100% { opacity: 1; transform: translateY(6px); } }
+    @keyframes leakPulse { 0% { opacity: .25; transform: translateX(-5px); } 100% { opacity: 1; transform: translateX(0); } }
+    @media (max-width: 760px) {
+      .funnel-visual-body { grid-template-columns: 1fr; padding: 18px 14px; }
+      .funnel-visual-head { padding: 16px; }
+      .funnel-stage { min-width: 178px; padding-inline: 20px; }
+      .funnel-stage span { font-size: .74rem; }
+      .leak-drop { font-size: .7rem; }
+    }
+    @media (max-width: 420px) {
+      .funnel-visual-head { flex-direction: column; }
+      .replay { width: 100%; }
+      .funnel-stage { min-width: 164px; }
+      .leak-drop { left: calc(50% + 8px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .move, .num-wrap { transition: none; }
+      .move:hover { transform: none; }
+      .move.is-calculating,
+      .move.is-calculating::after,
+      .move.is-calculating .calc-box,
+      .funnel-visual.is-playing .funnel-stage::before,
+      .funnel-visual.is-playing .leak-drop,
+      .funnel-visual.is-playing .leak-row { animation: none; }
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+    @media (min-width: 700px) { .summary { grid-template-columns: repeat(4, 1fr); } }
+    .summary-item {
+      position: relative;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--surface) 96%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      box-shadow: var(--shadow-soft);
+      padding: 15px;
+    }
+    .summary-item::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 2px;
+      background: var(--water);
+      box-shadow: 0 0 13px var(--water);
+    }
+    .summary-item:last-child::before { background: var(--pos); box-shadow: 0 0 13px var(--pos); }
+    .summary-item span { display: block; color: var(--ink-3); font-size: .76rem; }
+    .summary-item b { display: block; margin-top: 3px; font: 900 clamp(1.2rem, 3vw, 1.65rem)/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+    .summary-item b.good { color: var(--pos); }
+    .summary-item b.bad { color: var(--neg); }
+
+    .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+    .actions button {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: .86rem;
+    }
+    .actions button:hover { border-color: var(--copper); }
+    .actions button:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+    .actions #download {
+      position: relative;
+      overflow: hidden;
+      border-color: var(--copper);
+      background: var(--copper);
+      color: #fff;
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--copper) 24%, transparent);
+      font-weight: 700;
+    }
+    .actions #download::before {
+      content: "PDF";
+      display: inline-grid;
+      place-items: center;
+      margin-right: 8px;
+      padding: 2px 5px;
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 4px;
+      font-size: .62rem;
+      letter-spacing: .05em;
+      vertical-align: 1px;
+    }
+    .actions #download:hover { border-color: var(--copper); filter: brightness(.96); }
+    @media (prefers-color-scheme: dark) { .actions #download { color: #181009; } .actions #download::before { border-color: rgba(24,16,9,.45); } }
+
+    .guide { margin-top: 34px; }
+    .guide h2 { margin: 0 0 12px; font: 800 1.2rem/1.2 var(--font-display); }
+    .guide details { margin-bottom: 9px; padding: 13px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+    .guide summary { display: flex; justify-content: space-between; gap: 10px; cursor: pointer; list-style: none; font-weight: 600; }
+    .guide summary::-webkit-details-marker { display: none; }
+    .guide summary::after { content: "+"; color: var(--copper); font-size: 1.15rem; }
+    .guide details[open] summary::after { content: "−"; }
+    .guide p { margin: 9px 0 2px; color: var(--ink-2); font-size: .9rem; }
+
+    footer {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--ink-3);
+      font-size: .83rem;
+    }
+    .author-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 7px;
+      padding: 3px 7px;
+      background: var(--water-soft);
+      color: var(--water-deep);
+      font-weight: 700;
+      text-decoration: none;
+      transition: box-shadow .2s ease, color .2s ease;
+    }
+    .author-link svg { width: 14px; height: 14px; fill: currentColor; }
+    .author-link:hover { color: var(--water-deep); box-shadow: 0 0 0 2px color-mix(in srgb, var(--water) 24%, transparent), 0 0 18px color-mix(in srgb, var(--water) 18%, transparent); }
+    .author-link:focus-visible { outline: 2px solid var(--water); outline-offset: 2px; }
+
+    @media (max-width: 420px) {
+      .page { padding-inline: 14px; }
+      .quick { margin-inline: -14px; padding-inline: 14px; }
+      .move-head, .move-body { padding-left: 16px; padding-right: 16px; }
+      .field-top { gap: 8px; }
+      .num-wrap { min-width: 86px; }
+      .num-wrap input { width: 68px; }
+      .currency-bar { align-items: stretch; flex-direction: column; gap: 9px; }
+      .currency-select { width: 100%; }
+      .actions { flex-direction: column; }
+      .actions button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <div class="intro-copy">
+        <h1><span>Home Service</span> ROI Calculator</h1>
+        <p class="lede">Three moves to read your ads. Enter only the facts you can count; the calculator handles the rates, costs, profit and break-even math.</p>
+      </div>
+      <div class="intro-actions">
+        <a class="video-guide" href="https://youtu.be/cRTZ9lpFiV8" target="_blank" rel="noopener noreferrer" aria-label="Watch the complete calculator guide on YouTube in a new tab">
+          <svg viewBox="0 0 28 20" aria-hidden="true"><rect class="yt-body" x="0" y="0" width="28" height="20" rx="5"></rect><path class="yt-play" d="M11.2 5.5 19 10l-7.8 4.5z"></path></svg>
+          <span>Full video guide</span>
+        </a>
+        <a class="video-guide" href="https://www.linkedin.com/in/imamul-hassan-26a21a435/" target="_blank" rel="noopener noreferrer" aria-label="Connect with Imamul Hassan on LinkedIn in a new tab">
+          <svg viewBox="0 0 28 20" aria-hidden="true"><rect class="linkedin-body" x="4" y="0" width="20" height="20" rx="3"></rect><path class="linkedin-mark" d="M9.07 7.36H6.46V18h2.61V7.36ZM7.77 2A1.51 1.51 0 1 0 7.77 5a1.51 1.51 0 0 0 0-3Zm12.38 9.89c0-3.2-1.71-4.69-4-4.69a3.44 3.44 0 0 0-3.1 1.7V7.36h-2.61V18h2.61v-5.27c0-1.39.26-2.74 1.99-2.74 1.7 0 1.72 1.59 1.72 2.83V18h2.61v-5.54c0-.19 0-.38-.02-.57Z"></path></svg>
+          <span>Connect on LinkedIn</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="rule">
+      <span class="rule-mark">✓</span>
+      <span><b>You enter facts.</b> The calculator finds the numbers you should not have to work out yourself.</span>
+    </div>
+
+    <div class="currency-bar">
+      <div class="currency-copy">
+        <strong>Choose your currency</strong>
+        <span>This changes the symbol only. Your numbers stay the same.</span>
+      </div>
+      <label>
+        <span class="sr-only">Currency</span>
+        <select class="currency-select" id="currency" aria-label="Currency">
+          <option value="USD">USD ($)</option>
+          <option value="BDT">BDT (৳)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="CAD">CAD (C$)</option>
+          <option value="AUD">AUD (A$)</option>
+          <option value="INR">INR (₹)</option>
+          <option value="AED">AED</option>
+          <option value="SAR">SAR</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="quick" aria-hidden="true">
+      <span>Cost / lead<b id="q-cpl">—</b></span>
+      <span>Cost / customer<b id="q-cac">—</b></span>
+      <span>Net profit<b id="q-net">—</b></span>
+    </div>
+
+    <section class="moves" aria-label="Three calculation moves">
+      <article class="move" aria-labelledby="move1-title">
+        <div class="move-head">
+          <div class="move-label"><span class="step">1</span><h2 id="move1-title">Funnel rates</h2></div>
+          <p>Count how many people moved to each step.</p>
+        </div>
+        <div class="move-body">
+          <p class="eyebrow">You enter</p>
+
+          <div class="field first">
+            <div class="field-top"><label for="leads">Calls &amp; inquiries</label><div class="num-wrap"><input id="leads" type="number" inputmode="numeric" min="0" max="100000" step="1" value="500" /></div></div>
+            <p class="hint">Every real lead from calls, forms and messages.</p>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="contacted">People contacted</label><div class="num-wrap"><input id="contacted" type="number" inputmode="numeric" min="0" max="100000" step="1" value="420" /></div></div>
+            <p class="hint">You spoke with them or got a reply.</p>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="booked">Appointments booked</label><div class="num-wrap"><input id="booked" type="number" inputmode="numeric" min="0" max="100000" step="1" value="250" /></div></div>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="showed">Appointments showed</label><div class="num-wrap"><input id="showed" type="number" inputmode="numeric" min="0" max="100000" step="1" value="200" /></div></div>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="customers">Jobs closed</label><div class="num-wrap"><input id="customers" type="number" inputmode="numeric" min="0" max="100000" step="1" value="110" /></div></div>
+            <p class="hint">Paying customers from those same inquiries.</p>
+          </div>
+
+          <div id="funnel-warning" class="warning" hidden></div>
+
+          <div class="calc-box">
+            <p class="eyebrow">Calculator finds</p>
+            <div class="metric"><span>Contact rate<small class="formula">contacted ÷ inquiries</small></span><b id="contact-rate">—</b></div>
+            <div class="metric"><span>Booking rate<small class="formula">booked ÷ contacted</small></span><b id="booking-rate">—</b></div>
+            <div class="metric"><span>Show rate<small class="formula">showed ÷ booked</small></span><b id="show-rate">—</b></div>
+            <div class="metric"><span>Close rate<small class="formula">jobs ÷ showed</small></span><b id="close-rate">—</b></div>
+            <div class="metric"><span>Overall conversion<small class="formula">jobs ÷ inquiries</small></span><b id="overall-rate">—</b></div>
+            <p class="insight" id="leak-insight">—</p>
+            <button class="funnel-launch" id="funnel-launch" type="button" aria-expanded="false" aria-controls="funnel-visual">Show the leaks moving</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="move" aria-labelledby="move2-title">
+        <div class="move-head">
+          <div class="move-label"><span class="step">2</span><h2 id="move2-title">Lead costs</h2></div>
+          <p>Tell it what you spent. It connects spend to results.</p>
+        </div>
+        <div class="move-body">
+          <p class="eyebrow">You enter</p>
+          <div class="field first">
+            <div class="field-top"><label for="spend">Ad spend</label><div class="num-wrap"><span class="unit currency-symbol">$</span><input id="spend" type="number" inputmode="decimal" min="0" max="10000000" step="50" value="35000" /></div></div>
+            <p class="hint">Use the same date range as Move 1.</p>
+          </div>
+
+          <div class="calc-box">
+            <p class="eyebrow">Calculator finds</p>
+            <div class="metric"><span>Cost per lead<small class="formula">spend ÷ inquiries</small></span><b id="cost-lead">—</b></div>
+            <div class="metric"><span>Cost per customer (CAC)<small class="formula">spend ÷ jobs closed</small></span><b id="cost-customer">—</b></div>
+            <p class="insight" id="cost-insight">—</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="move" aria-labelledby="move3-title">
+        <div class="move-head">
+          <div class="move-label"><span class="step">3</span><h2 id="move3-title">Profit &amp; break-even</h2></div>
+          <p>Add two business facts. The rest is calculated.</p>
+        </div>
+        <div class="move-body">
+          <p class="eyebrow">You enter</p>
+          <div class="field first">
+            <div class="field-top"><label for="job-value">Average job value</label><div class="num-wrap"><span class="unit currency-symbol">$</span><input id="job-value" type="number" inputmode="decimal" min="0" max="1000000" step="10" value="1400" /></div></div>
+            <p class="hint">Total invoice revenue for one average job.</p>
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="margin">Profit margin</label><div class="num-wrap"><input id="margin" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="42" /><span class="unit tail">%</span></div></div>
+            <p class="hint">What remains after parts, labor and direct job costs.</p>
+
+            <div class="margin-help">
+              <button class="help-toggle" id="margin-toggle" type="button" aria-expanded="false" aria-controls="margin-helper">I don't know my profit margin</button>
+              <div class="helper" id="margin-helper" hidden>
+                <p class="helper-intro">For one average job, enter the direct costs below. The calculator uses your job value above.</p>
+                <div class="field first"><div class="field-top"><label for="parts">Parts &amp; materials</label><div class="num-wrap"><span class="unit currency-symbol">$</span><input id="parts" type="number" inputmode="decimal" min="0" max="1000000" step="10" placeholder="0" /></div></div></div>
+                <div class="field"><div class="field-top"><label for="labor">Labor</label><div class="num-wrap"><span class="unit currency-symbol">$</span><input id="labor" type="number" inputmode="decimal" min="0" max="1000000" step="10" placeholder="0" /></div></div></div>
+                <div class="field"><div class="field-top"><label for="other">Fuel &amp; other costs</label><div class="num-wrap"><span class="unit currency-symbol">$</span><input id="other" type="number" inputmode="decimal" min="0" max="1000000" step="10" placeholder="0" /></div></div></div>
+                <div class="helper-result"><strong id="helper-margin">Enter your costs</strong><span id="helper-detail">Margin = (job value − direct costs) ÷ job value</span></div>
+                <button class="btn" type="button" id="use-margin" disabled>Use this margin</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-box">
+            <p class="eyebrow">Calculator finds</p>
+            <div class="metric"><span>Revenue<small class="formula">jobs × average job value</small></span><b id="revenue">—</b></div>
+            <div class="metric"><span>ROAS<small class="formula">revenue ÷ ad spend</small></span><b id="roas">—</b></div>
+            <div class="metric"><span>Gross profit<small class="formula">revenue × margin</small></span><b id="gross-profit">—</b></div>
+            <div class="metric"><span>Net profit after ads<small class="formula">gross profit − ad spend</small></span><b id="net-profit">—</b></div>
+            <div class="metric"><span>ROI<small class="formula">net profit ÷ ad spend</small></span><b id="roi">—</b></div>
+            <div class="metric"><span>Break-even CAC<small class="formula">job value × margin</small></span><b id="break-even-cac">—</b></div>
+            <div class="metric"><span>Break-even ROAS<small class="formula">1 ÷ margin</small></span><b id="break-even-roas">—</b></div>
+            <p class="insight" id="profit-insight">—</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="funnel-visual" id="funnel-visual" aria-labelledby="funnel-title" hidden>
+      <div class="funnel-visual-head">
+        <div>
+          <h2 id="funnel-title">Watch the funnel leak</h2>
+          <p>Water represents people. Each drop shows exactly where they left the journey.</p>
+        </div>
+        <button class="replay" id="funnel-replay" type="button">Replay flow</button>
+      </div>
+      <div class="funnel-visual-body">
+        <div class="funnel-stack" id="funnel-stack" aria-label="Animated funnel showing people remaining at every stage"></div>
+        <div class="funnel-explain">
+          <h3>Where people were lost</h3>
+          <p>Every line compares one stage with the next. The biggest leak is highlighted.</p>
+          <div class="leak-list" id="leak-list"></div>
+          <div class="funnel-verdict" id="funnel-verdict">Enter your funnel counts to see the biggest leak.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary" aria-label="Final result">
+      <div class="summary-item"><span>Inquiries</span><b id="s-leads">—</b></div>
+      <div class="summary-item"><span>Jobs closed</span><b id="s-customers">—</b></div>
+      <div class="summary-item"><span>Revenue</span><b id="s-revenue">—</b></div>
+      <div class="summary-item"><span>Net profit after ads</span><b id="s-net">—</b></div>
+    </section>
+
+    <div class="actions">
+      <button type="button" id="reset">Reset example</button>
+      <button type="button" id="download">Download premium report</button>
+    </div>
+
+    <section class="guide" aria-labelledby="guide-title">
+      <h2 id="guide-title">Small questions, clear answers</h2>
+      <details>
+        <summary>Where do I find these numbers?</summary>
+        <p>Ad spend comes from the ad account. Calls and forms come from call tracking, your inbox or CRM. Contacted, booked, showed and closed come from the phone log, booking calendar and invoices. Keep every number inside the same date range.</p>
+      </details>
+      <details>
+        <summary>What if I only know leads and jobs closed?</summary>
+        <p>Use those two numbers in Move 1. Put the same lead count in contacted, booked and showed. You will still get a correct overall conversion rate, CPL and CAC. The middle-stage rates will only become useful once you start tracking those steps separately.</p>
+      </details>
+      <details>
+        <summary>Why can the calculator not discover my margin from ad data?</summary>
+        <p>Ads know spend, leads and conversions. They do not know your parts, labor or fuel costs. Use the margin helper in Move 3 with one average job. Never guess a margin just to complete a report.</p>
+      </details>
+    </section>
+
+    <footer>Made by <a class="author-link" href="https://www.linkedin.com/in/imamul-hassan-26a21a435/" target="_blank" rel="noopener noreferrer" aria-label="Open Imamul Hassan's LinkedIn profile in a new tab"><span>Imamul Hassan</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V8.99h3.41v1.57h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.26 2.37 4.26 5.45v6.29h.03ZM5.33 7.42a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.11 20.45H3.55V8.99h3.56v11.46Z"/></svg></a> — digital marketer for local service businesses.</footer>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var defaults = {
+        leads: 500,
+        contacted: 420,
+        booked: 250,
+        showed: 200,
+        customers: 110,
+        spend: 35000,
+        jobValue: 1400,
+        margin: 42
+      };
+      var ids = ["leads", "contacted", "booked", "showed", "customers", "spend", "job-value", "margin"];
+      var currencies = {
+        USD: { symbol: "$", prefix: "$" },
+        BDT: { symbol: "৳", prefix: "৳" },
+        GBP: { symbol: "£", prefix: "£" },
+        EUR: { symbol: "€", prefix: "€" },
+        CAD: { symbol: "C$", prefix: "C$" },
+        AUD: { symbol: "A$", prefix: "A$" },
+        INR: { symbol: "₹", prefix: "₹" },
+        AED: { symbol: "AED", prefix: "AED " },
+        SAR: { symbol: "SAR", prefix: "SAR " }
+      };
+
+      function el(id) { return document.getElementById(id); }
+      function currency() { return currencies[el("currency").value] || currencies.USD; }
+      function updateCurrencyUI() {
+        var symbol = currency().symbol;
+        Array.prototype.forEach.call(document.querySelectorAll(".currency-symbol"), function (node) {
+          node.textContent = symbol;
+        });
+      }
+      function val(id) {
+        var n = parseFloat(el(id).value);
+        return isFinite(n) && n >= 0 ? n : 0;
+      }
+      function safeDivide(a, b) { return b > 0 ? a / b : null; }
+      function money(n) {
+        if (n === null || !isFinite(n)) return "—";
+        var sign = n < 0 ? "−" : "";
+        return sign + currency().prefix + Math.round(Math.abs(n)).toLocaleString("en-US");
+      }
+      function number(n) {
+        if (n === null || !isFinite(n)) return "—";
+        return (Math.round(n * 10) / 10).toLocaleString("en-US", { maximumFractionDigits: 1 });
+      }
+      function percent(n) { return n === null || !isFinite(n) ? "—" : number(n * 100) + "%"; }
+      function multiple(n) { return n === null || !isFinite(n) ? "—" : number(n) + "×"; }
+      function setText(id, text) { el(id).textContent = text; }
+      function setSignedClass(id, n) {
+        var node = el(id);
+        node.classList.remove("good", "bad");
+        if (n !== null && isFinite(n)) node.classList.add(n >= 0 ? "good" : "bad");
+      }
+
+      var cardTimers = [];
+      function pulseCards(indexes) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var cards = document.querySelectorAll(".move");
+        indexes.forEach(function (index) {
+          var card = cards[index];
+          if (!card) return;
+          window.clearTimeout(cardTimers[index]);
+          card.classList.remove("is-calculating");
+          void card.offsetWidth;
+          card.classList.add("is-calculating");
+          cardTimers[index] = window.setTimeout(function () {
+            card.classList.remove("is-calculating");
+          }, 620);
+        });
+      }
+
+      function collect() {
+        return {
+          leads: val("leads"),
+          contacted: val("contacted"),
+          booked: val("booked"),
+          showed: val("showed"),
+          customers: val("customers"),
+          spend: val("spend"),
+          jobValue: val("job-value"),
+          margin: Math.min(100, val("margin")) / 100
+        };
+      }
+
+      function calculate(v) {
+        var revenue = v.customers * v.jobValue;
+        var gross = revenue * v.margin;
+        var net = gross - v.spend;
+        return {
+          contactRate: safeDivide(v.contacted, v.leads),
+          bookingRate: safeDivide(v.booked, v.contacted),
+          showRate: safeDivide(v.showed, v.booked),
+          closeRate: safeDivide(v.customers, v.showed),
+          overallRate: safeDivide(v.customers, v.leads),
+          cpl: safeDivide(v.spend, v.leads),
+          cac: safeDivide(v.spend, v.customers),
+          revenue: revenue,
+          roas: safeDivide(revenue, v.spend),
+          gross: gross,
+          net: net,
+          roi: safeDivide(net, v.spend),
+          breakEvenCac: v.jobValue * v.margin,
+          breakEvenRoas: v.margin > 0 ? 1 / v.margin : null
+        };
+      }
+
+      function renderWarning(v) {
+        var problems = [];
+        if (v.contacted > v.leads) problems.push("contacted is higher than inquiries");
+        if (v.booked > v.contacted) problems.push("booked is higher than contacted");
+        if (v.showed > v.booked) problems.push("showed is higher than booked");
+        if (v.customers > v.showed) problems.push("jobs closed is higher than showed");
+        var warning = el("funnel-warning");
+        warning.hidden = problems.length === 0;
+        warning.textContent = problems.length ? "Check your funnel: " + problems.join("; ") + "." : "";
+      }
+
+      function renderLeak(v) {
+        var losses = [
+          { name: "before contact", count: v.leads - v.contacted },
+          { name: "before booking", count: v.contacted - v.booked },
+          { name: "before showing", count: v.booked - v.showed },
+          { name: "before closing", count: v.showed - v.customers }
+        ].filter(function (x) { return x.count >= 0; });
+        if (!v.leads || !losses.length) {
+          el("leak-insight").textContent = "Enter your funnel counts to find the biggest leak.";
+          return;
+        }
+        losses.sort(function (a, b) { return b.count - a.count; });
+        el("leak-insight").innerHTML = "Biggest leak: <b>" + number(losses[0].count) + " people " + losses[0].name + "</b>. Fix this stage first.";
+      }
+
+      function renderFunnel(v) {
+        var stages = [
+          { label: "Calls & inquiries", count: v.leads },
+          { label: "Contacted", count: v.contacted },
+          { label: "Booked", count: v.booked },
+          { label: "Showed", count: v.showed },
+          { label: "Jobs closed", count: v.customers }
+        ];
+        var transitions = [
+          { label: "Inquiry → contacted", loss: v.leads - v.contacted, start: v.leads, action: "Check missed calls and response speed." },
+          { label: "Contacted → booked", loss: v.contacted - v.booked, start: v.contacted, action: "Check call handling and the booking process." },
+          { label: "Booked → showed", loss: v.booked - v.showed, start: v.booked, action: "Check reminders and appointment timing." },
+          { label: "Showed → closed", loss: v.showed - v.customers, start: v.showed, action: "Check estimates, trust and follow-up." }
+        ];
+        var valid = transitions.filter(function (item) { return item.loss >= 0; });
+        var maxLoss = valid.length ? Math.max.apply(null, valid.map(function (item) { return item.loss; })) : null;
+        var base = v.leads > 0 ? v.leads : 1;
+        var stack = [];
+        stages.forEach(function (stage, index) {
+          var width = Math.max(48, Math.min(100, (stage.count / base) * 100));
+          stack.push(
+            '<div class="funnel-stage-wrap">' +
+              '<div class="funnel-stage" style="--stage-width:' + width.toFixed(1) + '%;--delay:' + (index * 0.48).toFixed(2) + 's">' +
+                '<span>' + stage.label + '</span><b>' + number(stage.count) + '</b>' +
+              '</div>' +
+            '</div>'
+          );
+          if (index < transitions.length) {
+            var loss = transitions[index].loss;
+            var isBig = loss >= 0 && loss === maxLoss;
+            stack.push(
+              '<div class="funnel-joint">' +
+                '<div class="leak-drop' + (isBig ? ' big' : '') + '" style="--delay:' + (index * 0.48 + 0.24).toFixed(2) + 's">' +
+                  '<span class="drop-shape" aria-hidden="true"></span><span>' + (loss >= 0 ? number(loss) + ' lost' : 'check values') + '</span>' +
+                '</div>' +
+              '</div>'
+            );
+          }
+        });
+        el("funnel-stack").innerHTML = stack.join("");
+
+        el("leak-list").innerHTML = transitions.map(function (item, index) {
+          var isBig = item.loss >= 0 && item.loss === maxLoss;
+          var rate = item.start > 0 && item.loss >= 0 ? percent(item.loss / item.start) : "—";
+          return '<div class="leak-row' + (isBig ? ' big' : '') + '" style="--delay:' + (index * 0.48 + 0.28).toFixed(2) + 's">' +
+            '<span>' + item.label + '</span><b>' + (item.loss >= 0 ? number(item.loss) + ' lost · ' + rate : 'Check values') + '</b></div>';
+        }).join("");
+
+        if (maxLoss === null || !v.leads) {
+          el("funnel-verdict").textContent = "Enter valid funnel counts to see the biggest leak.";
+          return;
+        }
+        var biggest = transitions.filter(function (item) { return item.loss === maxLoss; })[0];
+        el("funnel-verdict").innerHTML = '<b>Biggest leak: ' + number(biggest.loss) + ' people.</b> ' + biggest.action;
+      }
+
+      function replayFunnel() {
+        var panel = el("funnel-visual");
+        panel.classList.remove("is-playing");
+        void panel.offsetWidth;
+        panel.classList.add("is-playing");
+      }
+
+      function render() {
+        var v = collect();
+        var r = calculate(v);
+
+        setText("contact-rate", percent(r.contactRate));
+        setText("booking-rate", percent(r.bookingRate));
+        setText("show-rate", percent(r.showRate));
+        setText("close-rate", percent(r.closeRate));
+        setText("overall-rate", percent(r.overallRate));
+        renderWarning(v);
+        renderLeak(v);
+
+        setText("cost-lead", money(r.cpl));
+        setText("cost-customer", money(r.cac));
+        el("cost-insight").innerHTML = v.leads && v.customers
+          ? "Your <b>" + money(v.spend) + "</b> spend produced <b>" + number(v.leads) + " leads</b> and <b>" + number(v.customers) + " paying customers</b>."
+          : "Add spend, inquiries and jobs closed to calculate your costs.";
+
+        setText("revenue", money(r.revenue));
+        setText("roas", multiple(r.roas));
+        setText("gross-profit", money(r.gross));
+        setText("net-profit", money(r.net));
+        setText("roi", percent(r.roi));
+        setText("break-even-cac", money(r.breakEvenCac));
+        setText("break-even-roas", multiple(r.breakEvenRoas));
+        setSignedClass("net-profit", r.net);
+        setSignedClass("roi", r.roi);
+
+        if (r.cac === null || r.breakEvenCac <= 0) {
+          el("profit-insight").textContent = "Enter jobs closed, job value and margin to test break-even.";
+        } else if (r.cac <= r.breakEvenCac) {
+          el("profit-insight").innerHTML = "Past break-even: your <b>" + money(r.cac) + " CAC</b> is below the <b>" + money(r.breakEvenCac) + " limit</b>.";
+        } else {
+          el("profit-insight").innerHTML = "Below break-even: your <b>" + money(r.cac) + " CAC</b> is above the <b>" + money(r.breakEvenCac) + " limit</b>.";
+        }
+
+        setText("q-cpl", money(r.cpl));
+        setText("q-cac", money(r.cac));
+        setText("q-net", money(r.net));
+        setSignedClass("q-net", r.net);
+        setText("s-leads", number(v.leads));
+        setText("s-customers", number(v.customers));
+        setText("s-revenue", money(r.revenue));
+        setText("s-net", money(r.net));
+        setSignedClass("s-net", r.net);
+
+        renderFunnel(v);
+        updateMarginHelper();
+      }
+
+      function helperNumber(id) {
+        var raw = el(id).value.trim();
+        if (raw === "") return null;
+        var n = parseFloat(raw);
+        return isFinite(n) && n >= 0 ? n : null;
+      }
+
+      function updateMarginHelper() {
+        var parts = helperNumber("parts");
+        var labor = helperNumber("labor");
+        var other = helperNumber("other");
+        var jobValue = val("job-value");
+        var hasAny = parts !== null || labor !== null || other !== null;
+        var total = (parts || 0) + (labor || 0) + (other || 0);
+        var btn = el("use-margin");
+        if (!hasAny || jobValue <= 0) {
+          setText("helper-margin", "Enter your costs");
+          setText("helper-detail", "Margin = (job value − direct costs) ÷ job value");
+          btn.disabled = true;
+          btn.dataset.margin = "";
+          return;
+        }
+        var keep = jobValue - total;
+        var margin = (keep / jobValue) * 100;
+        if (margin < 0) {
+          setText("helper-margin", number(margin) + "% margin — this job loses money");
+          setText("helper-detail", money(jobValue) + " job − " + money(total) + " direct costs = " + money(keep) + " kept. Reduce costs or raise the job value before using a margin.");
+          btn.disabled = true;
+          btn.dataset.margin = "";
+          return;
+        }
+        margin = Math.min(100, margin);
+        setText("helper-margin", number(margin) + "% profit margin");
+        setText("helper-detail", money(jobValue) + " job − " + money(total) + " direct costs = " + money(keep) + " kept");
+        btn.disabled = false;
+        btn.dataset.margin = String(margin);
+      }
+
+      ids.forEach(function (id) {
+        el(id).addEventListener("input", function () {
+          render();
+          if (["leads", "contacted", "booked", "showed", "customers"].indexOf(id) !== -1) pulseCards([0, 1, 2]);
+          else if (id === "spend") pulseCards([1, 2]);
+          else pulseCards([2]);
+        });
+      });
+      ["parts", "labor", "other"].forEach(function (id) {
+        el(id).addEventListener("input", function () {
+          updateMarginHelper();
+          pulseCards([2]);
+        });
+      });
+      el("currency").addEventListener("change", function () {
+        updateCurrencyUI();
+        render();
+        pulseCards([0, 1, 2]);
+      });
+
+      el("funnel-launch").addEventListener("click", function () {
+        var panel = el("funnel-visual");
+        var opening = panel.hidden;
+        panel.hidden = !opening;
+        this.setAttribute("aria-expanded", String(opening));
+        this.textContent = opening ? "Hide the animated funnel" : "Show the leaks moving";
+        if (opening) {
+          renderFunnel(collect());
+          replayFunnel();
+          panel.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+        }
+      });
+      el("funnel-replay").addEventListener("click", replayFunnel);
+
+      el("margin-toggle").addEventListener("click", function () {
+        var open = this.getAttribute("aria-expanded") === "true";
+        this.setAttribute("aria-expanded", String(!open));
+        el("margin-helper").hidden = open;
+      });
+
+      el("use-margin").addEventListener("click", function () {
+        if (!this.dataset.margin) return;
+        el("margin").value = (Math.round(parseFloat(this.dataset.margin) * 10) / 10).toString();
+        render();
+        pulseCards([2]);
+      });
+
+      el("reset").addEventListener("click", function () {
+        el("leads").value = defaults.leads;
+        el("contacted").value = defaults.contacted;
+        el("booked").value = defaults.booked;
+        el("showed").value = defaults.showed;
+        el("customers").value = defaults.customers;
+        el("spend").value = defaults.spend;
+        el("job-value").value = defaults.jobValue;
+        el("margin").value = defaults.margin;
+        ["parts", "labor", "other"].forEach(function (id) { el(id).value = ""; });
+        render();
+        pulseCards([0, 1, 2]);
+      });
+
+      function reportMoney(n) {
+        if (n === null || !isFinite(n)) return "Not available";
+        var sign = n < 0 ? "-" : "";
+        return sign + el("currency").value + " " + Math.round(Math.abs(n)).toLocaleString("en-US");
+      }
+
+      function pdfSafe(text) {
+        return String(text)
+          .replace(/×/g, "x")
+          .replace(/—/g, "-")
+          .replace(/−/g, "-")
+          .replace(/[‘’]/g, "'")
+          .replace(/[“”]/g, '"')
+          .replace(/[^\x20-\x7E]/g, "")
+          .replace(/\\/g, "\\\\")
+          .replace(/\(/g, "\\(")
+          .replace(/\)/g, "\\)");
+      }
+
+      function buildPremiumPdf(v, r) {
+        var W = 595;
+        var H = 842;
+        var out = [];
+        var colors = {
+          navy: [0.043, 0.082, 0.133],
+          navy2: [0.075, 0.125, 0.184],
+          cyan: [0.075, 0.671, 0.792],
+          copper: [0.769, 0.376, 0.118],
+          ink: [0.071, 0.098, 0.137],
+          slate: [0.239, 0.290, 0.349],
+          muted: [0.424, 0.478, 0.541],
+          line: [0.824, 0.851, 0.878],
+          pale: [0.949, 0.965, 0.976],
+          white: [1, 1, 1],
+          green: [0.031, 0.478, 0.333],
+          greenPale: [0.882, 0.961, 0.929],
+          red: [0.741, 0.231, 0.208],
+          redPale: [0.976, 0.902, 0.894]
+        };
+        function c(color, stroke) {
+          return color.map(function (n) { return n.toFixed(3); }).join(" ") + (stroke ? " RG" : " rg");
+        }
+        function rect(x, y, w, h, fill, stroke) {
+          out.push("q " + c(fill, false) + " " + x + " " + (H - y - h) + " " + w + " " + h + " re f Q");
+          if (stroke) out.push("q " + c(stroke, true) + " 0.7 w " + x + " " + (H - y - h) + " " + w + " " + h + " re S Q");
+        }
+        function line(x1, y1, x2, y2, color, width) {
+          out.push("q " + c(color, true) + " " + (width || 1) + " w " + x1 + " " + (H - y1) + " m " + x2 + " " + (H - y2) + " l S Q");
+        }
+        function text(x, y, size, value, bold, color) {
+          out.push("BT /" + (bold ? "F2" : "F1") + " " + size + " Tf " + c(color || colors.ink, false) + " 1 0 0 1 " + x + " " + (H - y) + " Tm (" + pdfSafe(value) + ") Tj ET");
+        }
+        function rightText(right, y, size, value, bold, color) {
+          var rough = String(value).length * size * (bold ? .56 : .51);
+          text(Math.max(20, right - rough), y, size, value, bold, color);
+        }
+        function metricTile(x, label, value, accent) {
+          rect(x, 108, 126, 68, colors.navy2, [0.16, 0.235, 0.31]);
+          rect(x, 108, 4, 68, accent);
+          text(x + 14, 129, 7, label.toUpperCase(), true, [0.59, 0.68, 0.76]);
+          text(x + 14, 154, 15, value, true, colors.white);
+        }
+        function sectionTitle(x, y, step, title, accent) {
+          rect(x, y - 13, 22, 22, accent);
+          text(x + 8, y + 2, 8, step, true, colors.white);
+          text(x + 31, y + 2, 11, title.toUpperCase(), true, colors.ink);
+        }
+        function kv(x, y, width, label, value, strongColor) {
+          text(x, y, 8.5, label, false, colors.slate);
+          rightText(x + width, y, 9, value, true, strongColor || colors.ink);
+          line(x, y + 7, x + width, y + 7, colors.line, .55);
+        }
+
+        var losses = [
+          { label: "Inquiry to contacted", count: v.leads - v.contacted, fix: "Check missed calls and response speed." },
+          { label: "Contacted to booked", count: v.contacted - v.booked, fix: "Check call handling and the booking process." },
+          { label: "Booked to showed", count: v.booked - v.showed, fix: "Check reminders and appointment timing." },
+          { label: "Showed to closed", count: v.showed - v.customers, fix: "Check estimates, trust and follow-up." }
+        ].filter(function (item) { return item.count >= 0; });
+        losses.sort(function (a, b) { return b.count - a.count; });
+        var biggest = losses[0] || null;
+        var profitable = r.net >= 0;
+        var status = profitable ? "PROFITABLE" : "BELOW BREAK-EVEN";
+        var dateText = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+        rect(0, 0, W, H, colors.white);
+        rect(0, 0, W, 153, colors.navy);
+        rect(0, 0, 8, 153, colors.copper);
+        text(30, 31, 7.5, "HOME SERVICE PERFORMANCE  /  " + el("currency").value, true, colors.cyan);
+        text(30, 62, 23, "AD PERFORMANCE BRIEF", true, colors.white);
+        text(30, 84, 9.5, "Funnel, acquisition cost, profit and break-even - presented in one clear view.", false, [0.72, 0.79, 0.85]);
+        rightText(565, 31, 8, "GENERATED " + dateText.toUpperCase(), true, [0.57, 0.66, 0.74]);
+
+        metricTile(30, "Inquiries", number(v.leads), colors.cyan);
+        metricTile(166, "Jobs closed", number(v.customers), colors.copper);
+        metricTile(302, "Revenue", reportMoney(r.revenue), colors.cyan);
+        metricTile(438, "Net profit", reportMoney(r.net), profitable ? colors.green : colors.red);
+
+        sectionTitle(30, 208, "1", "Funnel performance", colors.copper);
+        rect(30, 226, 535, 194, colors.white, colors.line);
+        text(48, 247, 7.5, "PEOPLE REMAINING AT EACH STAGE", true, colors.muted);
+
+        var funnelStages = [
+          { label: "Inquiries", value: v.leads, rate: null },
+          { label: "Contacted", value: v.contacted, rate: r.contactRate },
+          { label: "Booked", value: v.booked, rate: r.bookingRate },
+          { label: "Showed", value: v.showed, rate: r.showRate },
+          { label: "Closed", value: v.customers, rate: r.closeRate }
+        ];
+        var base = v.leads > 0 ? v.leads : 1;
+        funnelStages.forEach(function (stage, index) {
+          var y = 267 + index * 28;
+          var barWidth = Math.max(14, Math.min(188, (stage.value / base) * 188));
+          text(48, y + 10, 8.5, stage.label, index === 0 || index === 4, colors.slate);
+          rect(112, y, 188, 13, colors.pale);
+          rect(112, y, barWidth, 13, index === 4 ? colors.copper : colors.cyan);
+          rightText(343, y + 10, 9, number(stage.value), true, colors.ink);
+          if (stage.rate !== null) rightText(377, y + 10, 7.5, percent(stage.rate), true, colors.muted);
+        });
+
+        line(400, 245, 400, 400, colors.line, .7);
+        text(420, 247, 7.5, "FUNNEL READ", true, colors.muted);
+        text(420, 279, 26, percent(r.overallRate), true, colors.ink);
+        text(420, 296, 8, "overall conversion", false, colors.muted);
+        rect(420, 315, 125, 1, colors.line);
+        text(420, 340, 7.5, "BIGGEST LEAK", true, biggest ? colors.red : colors.muted);
+        text(420, 361, 16, biggest ? number(biggest.count) + " people" : "Check data", true, biggest ? colors.red : colors.muted);
+        text(420, 379, 7.8, biggest ? biggest.label : "Use descending stage counts", false, colors.slate);
+        text(420, 394, 7.5, biggest ? biggest.fix : "", false, colors.muted);
+
+        sectionTitle(30, 452, "2", "Acquisition cost", colors.cyan);
+        sectionTitle(305, 452, "3", "Profit and break-even", colors.green);
+        rect(30, 470, 255, 158, colors.white, colors.line);
+        rect(305, 470, 260, 158, colors.white, colors.line);
+
+        kv(48, 496, 217, "Ad spend", reportMoney(v.spend));
+        kv(48, 524, 217, "Cost per lead", reportMoney(r.cpl));
+        kv(48, 552, 217, "Cost per customer (CAC)", reportMoney(r.cac));
+        kv(48, 580, 217, "ROAS", r.roas === null ? "Not available" : number(r.roas) + "x");
+        text(48, 607, 7.4, number(v.leads) + " leads  /  " + number(v.customers) + " customers", true, colors.muted);
+
+        kv(323, 496, 224, "Average job value", reportMoney(v.jobValue));
+        kv(323, 524, 224, "Profit margin", percent(v.margin));
+        kv(323, 552, 224, "Gross profit", reportMoney(r.gross));
+        kv(323, 580, 224, "Break-even CAC", reportMoney(r.breakEvenCac));
+        kv(323, 608, 224, "Break-even ROAS", r.breakEvenRoas === null ? "Not available" : number(r.breakEvenRoas) + "x");
+
+        rect(30, 651, 535, 117, profitable ? colors.greenPale : colors.redPale, profitable ? [0.63, 0.84, 0.75] : [0.91, 0.69, 0.67]);
+        rect(30, 651, 6, 117, profitable ? colors.green : colors.red);
+        text(50, 676, 7.5, "BUSINESS VERDICT", true, profitable ? colors.green : colors.red);
+        text(50, 705, 18, status, true, profitable ? colors.green : colors.red);
+        text(50, 727, 9.5, "Net profit after ads: " + reportMoney(r.net) + "  /  ROI: " + percent(r.roi), true, colors.ink);
+        if (r.cac !== null && r.breakEvenCac > 0) {
+          text(50, 748, 8.5, "Your CAC is " + reportMoney(r.cac) + "; break-even is " + reportMoney(r.breakEvenCac) + ".", false, colors.slate);
+        }
+        text(342, 676, 7.5, "NEXT FOCUS", true, colors.copper);
+        text(342, 700, 11, biggest ? biggest.label : "Validate the funnel", true, colors.ink);
+        text(342, 721, 8.2, biggest ? number(biggest.count) + " people were lost here." : "Stage counts should move downward.", false, colors.slate);
+        text(342, 743, 8.2, biggest ? biggest.fix : "Check every number before sharing.", false, colors.slate);
+
+        line(30, 797, 565, 797, colors.line, .7);
+        text(30, 817, 7.5, "Prepared with the Home Service ROI Calculator", false, colors.muted);
+
+        var stream = out.join("\n");
+        var objects = [
+          "<< /Type /Catalog /Pages 2 0 R >>",
+          "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+          "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>",
+          "<< /Length " + stream.length + " >>\nstream\n" + stream + "\nendstream",
+          "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+          "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
+          "<< /Title (Home Service Ad Performance Brief) /Creator (Home Service ROI Calculator) >>"
+        ];
+        var pdf = "%PDF-1.4\n%HATCH\n";
+        var offsets = [0];
+        objects.forEach(function (object, index) {
+          offsets[index + 1] = pdf.length;
+          pdf += (index + 1) + " 0 obj\n" + object + "\nendobj\n";
+        });
+        var xref = pdf.length;
+        pdf += "xref\n0 " + (objects.length + 1) + "\n0000000000 65535 f \n";
+        for (var i = 1; i <= objects.length; i++) {
+          pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+        }
+        pdf += "trailer\n<< /Size " + (objects.length + 1) + " /Root 1 0 R /Info 7 0 R >>\nstartxref\n" + xref + "\n%%EOF";
+        return pdf;
+      }
+
+      el("download").addEventListener("click", function () {
+        var v = collect();
+        var r = calculate(v);
+        var pdf = buildPremiumPdf(v, r);
+        var blob = new Blob([pdf], { type: "application/pdf" });
+        var a = document.createElement("a");
+        var button = this;
+        a.href = URL.createObjectURL(blob);
+        a.download = "home-service-ad-performance-brief.pdf";
+        document.body.appendChild(a);
+        a.click();
+        button.textContent = "Premium PDF downloaded";
+        window.setTimeout(function () {
+          URL.revokeObjectURL(a.href);
+          a.remove();
+          button.textContent = "Download premium report";
+        }, 1200);
+      });
+
+      updateCurrencyUI();
+      render();
+    })();
+  </script>
+</body>
+</html>
