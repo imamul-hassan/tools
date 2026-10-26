@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Teleprompter — Personal</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #05070d; color: #f2f4f8; font-family: 'Segoe UI', Arial, sans-serif; height: 100%; }
+  button { cursor: pointer; border: none; border-radius: 10px; font-weight: 700; }
+  .view { display: none; padding: 20px 5vw 40px 5vw; max-width: 700px; margin: 0 auto; }
+  .view.active { display: block; }
+  h1 { font-size: 28px; margin-bottom: 6px; }
+  .sub { color: #8a94a8; font-size: 15px; margin-bottom: 20px; }
+  label { display: block; font-size: 14px; color: #8a94a8; margin: 16px 0 6px 0; }
+  textarea {
+    width: 100%; min-height: 180px; background: #0d1322; color: #f2f4f8;
+    border: 2px solid #1c2740; border-radius: 12px; padding: 14px;
+    font-size: 20px; line-height: 1.5; resize: vertical;
+  }
+  input[type=range] { width: 100%; accent-color: #35c4e8; }
+  .row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .row button { flex: 1; padding: 14px 10px; font-size: 17px; min-width: 120px; }
+  .primary { background: #35c4e8; color: #05070d; }
+  .ghost { background: #1c2740; color: #f2f4f8; }
+  .ghost.on { background: #35c4e8; color: #05070d; }
+  .privacy {
+    border: 2px solid #35c4e8; border-radius: 12px; padding: 14px 16px;
+    margin-top: 22px; font-size: 15px; line-height: 1.6; color: #c9d2e0; background: #0d1322;
+  }
+  .privacy b { color: #f5b942; }
+  .err { color: #ff6b6b; font-size: 16px; margin-top: 14px; display: none; }
+  /* Studio */
+  #studio { padding: 0; max-width: none; height: 100%; position: relative; overflow: hidden; }
+  #preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  #preview.mirror { transform: scaleX(-1); }
+  #prompt {
+    position: absolute; left: 4vw; right: 4vw; top: 9%;
+    background: rgba(5, 7, 13, 0.62); border-radius: 14px; padding: 10px 14px;
+    border-left: 5px solid #f5b942;
+  }
+  #scrollBox { overflow: hidden; height: 34vh; }
+  #scrollBox .line { font-weight: 700; line-height: 1.45; margin-bottom: 14px; color: #ffffff; text-shadow: 0 2px 6px #000; }
+  #scrollBox .line.dim { color: #9aa3b5; }
+  #readGuide { height: 3px; background: #f5b942; margin-bottom: 8px; border-radius: 3px; }
+  #countdown {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    font-size: 120px; font-weight: 800; color: #f5b942; text-shadow: 0 4px 20px #000; z-index: 5;
+  }
+  #topBar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 4;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; font-size: 18px; font-weight: 700;
+  }
+  #recDot { display: none; color: #ff3b30; }
+  #recDot.live { display: inline; }
+  #controls {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+    padding: 14px; display: flex; gap: 10px; flex-wrap: wrap;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+  }
+  #controls button { flex: 1; padding: 14px 6px; font-size: 16px; min-width: 70px; }
+  #recBtn { background: #ff3b30; color: #fff; }
+  #recBtn.stop { background: #f2f4f8; color: #05070d; }
+  .mini { font-size: 13px; color: #c9d2e0; text-align: center; width: 100%; margin-top: 6px; }
+  /* Review */
+  #reviewVideo { width: 100%; max-height: 55vh; background: #000; border-radius: 12px; }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="view active">
+  <h1>My Teleprompter</h1>
+  <p class="sub">Hold your phone vertical (9:16). Script scrolls near the top, close to the front camera. The words are only on your screen — they are never recorded into the video.</p>
+
+  <label for="scriptInput">Your script — one idea per line</label>
+  <textarea id="scriptInput" placeholder="Type or paste your beats here.&#10;One idea per line.&#10;Example:&#10;One shop has 40 reviews. The other has 300.&#10;Guess who wins?"></textarea>
+
+  <label for="fileInput">Or upload a script file (.txt / .md)</label>
+  <input id="fileInput" type="file" accept=".txt,.md,text/plain" style="width:100%; background:#1c2740; color:#f2f4f8; border:2px solid #1c2740; border-radius:12px; padding:12px;">
+  <p id="fileMsg" class="sub" style="display:none; margin-top:8px;"></p>
+
+  <label>Scroll speed: <span id="speedVal">40</span> px / second</label>
+  <input type="range" id="speed" min="15" max="120" value="40">
+
+  <label>Text size: <span id="sizeVal">40</span> px</label>
+  <input type="range" id="size" min="26" max="72" value="40">
+
+  <label>Camera</label>
+  <div class="row">
+    <button id="camFront" class="ghost on" type="button">Front camera</button>
+    <button id="camBack" class="ghost" type="button">Back camera</button>
+  </div>
+
+  <div class="row">
+    <button id="startBtn" class="primary" type="button">Open camera</button>
+  </div>
+  <p id="setupErr" class="err"></p>
+
+  <div class="privacy">
+    <b>Privacy — read this once:</b><br>
+    This page makes <b>zero network requests</b>. No account, no login, no third-party code, no tracking, no uploads.<br>
+    Your script lives only while this page is open — it is never saved anywhere.<br>
+    Your video is recorded on this phone only. It leaves the phone only when <b>you</b> share or upload it.<br>
+    The camera runs only while this page is open. Close the page and it stops.
+  </div>
+</div>
+
+<!-- STUDIO -->
+<div id="studio" class="view">
+  <video id="preview" autoplay playsinline muted></video>
+  <div id="topBar"><span id="timer">00:00</span><span id="recDot">● REC</span></div>
+  <div id="prompt">
+    <div id="readGuide"></div>
+    <div id="scrollBox"></div>
+  </div>
+  <div id="countdown"></div>
+  <div id="controls">
+    <div class="mini">Tap "Pause script" anytime to stop the words. Tap again to continue. The words never appear in your video.</div>
+    <button id="recBtn" type="button">● Record</button>
+    <button id="pauseBtn" class="ghost" type="button">Pause script</button>
+    <button id="slowerBtn" class="ghost" type="button">− Speed</button>
+    <button id="fasterBtn" class="ghost" type="button">+ Speed</button>
+    <button id="backBtn" class="ghost" type="button">Back</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="review" class="view">
+  <h1>Your take</h1>
+  <p class="sub">Watch it back. If you like it, download it — it saves to your phone. From there, upload it to OneDrive or Google Drive and it reaches your PC folder.</p>
+  <video id="reviewVideo" controls playsinline></video>
+  <div class="row">
+    <a id="dlBtn" style="flex:1; text-align:center; background:#35c4e8; color:#05070d; border-radius:10px; padding:14px 10px; font-weight:700; font-size:17px; text-decoration:none;" download>Download video</a>
+  </div>
+  <div class="row">
+    <button id="againBtn" class="ghost" type="button">Record again (same script)</button>
+    <button id="newBtn" class="ghost" type="button">New script</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var setupView = document.getElementById('setup');
+  var studioView = document.getElementById('studio');
+  var reviewView = document.getElementById('review');
+  var scriptInput = document.getElementById('scriptInput');
+  var speedInput = document.getElementById('speed');
+  var sizeInput = document.getElementById('size');
+  var speedVal = document.getElementById('speedVal');
+  var sizeVal = document.getElementById('sizeVal');
+  var setupErr = document.getElementById('setupErr');
+  var preview = document.getElementById('preview');
+  var scrollBox = document.getElementById('scrollBox');
+  var timerEl = document.getElementById('timer');
+  var recDot = document.getElementById('recDot');
+  var countdownEl = document.getElementById('countdown');
+
+  var facing = 'user';
+  var speed = 40;
+  var fontSize = 40;
+  var stream = null;
+  var recorder = null;
+  var chunks = [];
+  var recording = false;
+  var scriptPaused = false;
+  var rafId = null;
+  var lastTick = 0;
+  var recStart = 0;
+  var timerId = null;
+  var wakeLock = null;
+  var blobUrl = null;
+  var countdownId = null;
+
+  function show(view) {
+    setupView.classList.remove('active');
+    studioView.classList.remove('active');
+    reviewView.classList.remove('active');
+    view.classList.add('active');
+  }
+  function fmt(n) { return (n < 10 ? '0' : '') + n; }
+  function stamp() {
+    var d = new Date();
+    return d.getFullYear() + fmt(d.getMonth() + 1) + fmt(d.getDate()) + '-' + fmt(d.getHours()) + fmt(d.getMinutes());
+  }
+
+  speedInput.addEventListener('input', function () { speed = +speedInput.value; speedVal.textContent = speed; });
+  sizeInput.addEventListener('input', function () { fontSize = +sizeInput.value; sizeVal.textContent = fontSize; });
+  document.getElementById('fileInput').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    var msg = document.getElementById('fileMsg');
+    reader.onload = function () {
+      scriptInput.value = reader.result;
+      msg.textContent = 'Loaded: ' + f.name + ' — ready to record.';
+      msg.style.display = 'block';
+    };
+    reader.onerror = function () {
+      msg.textContent = 'Could not read that file. Try a plain .txt file.';
+      msg.style.display = 'block';
+    };
+    reader.readAsText(f);
+  });
+  document.getElementById('camFront').addEventListener('click', function () {
+    facing = 'user';
+    document.getElementById('camFront').classList.add('on');
+    document.getElementById('camBack').classList.remove('on');
+  });
+  document.getElementById('camBack').addEventListener('click', function () {
+    facing = 'environment';
+    document.getElementById('camBack').classList.add('on');
+    document.getElementById('camFront').classList.remove('on');
+  });
+
+  function buildLines() {
+    var lines = scriptInput.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
+    scrollBox.innerHTML = '';
+    lines.forEach(function (text) {
+      var div = document.createElement('div');
+      div.className = 'line';
+      div.textContent = text;
+      div.style.fontSize = fontSize + 'px';
+      scrollBox.appendChild(div);
+    });
+    scrollBox.scrollTop = 0;
+    return lines.length;
+  }
+
+  function stopStream() {
+    if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+    if (wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
+  }
+
+  function startCamera() {
+    setupErr.style.display = 'none';
+    if (buildLines() === 0) {
+      setupErr.textContent = 'Write your script first — at least one line.';
+      setupErr.style.display = 'block';
+      return;
+    }
+    var constraints = { audio: true, video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1920 } } };
+    navigator.mediaDevices.getUserMedia(constraints).then(function (s) {
+      stream = s;
+      preview.srcObject = stream;
+      preview.classList.toggle('mirror', facing === 'user');
+      show(studioView);
+      scriptPaused = false;
+      document.getElementById('pauseBtn').textContent = 'Pause script';
+    }).catch(function (err) {
+      setupErr.textContent = 'Camera blocked. Allow camera permission in Chrome, then try again. (' + (err && err.name ? err.name : 'error') + ')';
+      setupErr.style.display = 'block';
+    });
+  }
+  document.getElementById('startBtn').addEventListener('click', startCamera);
+
+  function scrollStep(ts) {
+    if (!lastTick) lastTick = ts;
+    var dt = (ts - lastTick) / 1000;
+    lastTick = ts;
+    if (!scriptPaused) {
+      scrollBox.scrollTop += speed * dt;
+      if (scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight - 2) {
+        scriptPaused = true;
+        document.getElementById('pauseBtn').textContent = 'Script ended';
+      }
+    }
+    if (recording || !scriptPaused) { rafId = requestAnimationFrame(scrollStep); }
+  }
+
+  function startTimer() {
+    recStart = Date.now();
+    timerId = setInterval(function () {
+      var s = Math.floor((Date.now() - recStart) / 1000);
+      timerEl.textContent = fmt(Math.floor(s / 60)) + ':' + fmt(s % 60);
+    }, 500);
+  }
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } timerEl.textContent = '00:00'; }
+
+  function pickMime() {
+    var list = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'];
+    for (var i = 0; i < list.length; i++) {
+      try { if (window.MediaRecorder && MediaRecorder.isTypeSupported(list[i])) return list[i]; } catch (e) {}
+    }
+    return '';
+  }
+
+  function startRecording() {
+    chunks = [];
+    var opts = {};
+    var mime = pickMime();
+    if (mime) opts.mimeType = mime;
+    try {
+      recorder = new MediaRecorder(stream, opts);
+    } catch (e) {
+      setupErr.textContent = 'This browser cannot record video. Try Chrome on Android.';
+      setupErr.style.display = 'block';
+      stopStream();
+      show(setupView);
+      return;
+    }
+    recorder.ondataavailable = function (e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = function () {
+      var type = mime || 'video/webm';
+      var blob = new Blob(chunks, { type: type });
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      blobUrl = URL.createObjectURL(blob);
+      var rv = document.getElementById('reviewVideo');
+      rv.src = blobUrl;
+      var dl = document.getElementById('dlBtn');
+      dl.href = blobUrl;
+      var ext = type.indexOf('mp4') !== -1 ? 'mp4' : 'webm';
+      dl.download = 'short-' + stamp() + '.' + ext;
+      stopStream();
+      stopTimer();
+      recDot.classList.remove('live');
+      show(reviewView);
+    };
+    recorder.start(250);
+    recording = true;
+    recDot.classList.add('live');
+    document.getElementById('recBtn').textContent = '■ Stop';
+    document.getElementById('recBtn').classList.add('stop');
+    scrollBox.scrollTop = 0;
+    scriptPaused = false;
+    document.getElementById('pauseBtn').textContent = 'Pause script';
+    lastTick = 0;
+    rafId = requestAnimationFrame(scrollStep);
+    startTimer();
+    try {
+      if (navigator.wakeLock) { navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; }).catch(function () {}); }
+    } catch (e) {}
+  }
+
+  function countdownThenRecord() {
+    var n = 3;
+    countdownEl.style.display = 'flex';
+    countdownEl.textContent = n;
+    countdownId = setInterval(function () {
+      n -= 1;
+      if (n <= 0) {
+        clearInterval(countdownId);
+        countdownId = null;
+        countdownEl.style.display = 'none';
+        startRecording();
+      } else {
+        countdownEl.textContent = n;
+      }
+    }, 1000);
+  }
+
+  document.getElementById('recBtn').addEventListener('click', function () {
+    if (!recording) { countdownThenRecord(); }
+    else {
+      recording = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      document.getElementById('recBtn').textContent = '● Record';
+      document.getElementById('recBtn').classList.remove('stop');
+      try { recorder.stop(); } catch (e) {}
+    }
+  });
+
+  document.getElementById('pauseBtn').addEventListener('click', function () {
+    scriptPaused = !scriptPaused;
+    document.getElementById('pauseBtn').textContent = scriptPaused ? 'Resume script' : 'Pause script';
+    if (!scriptPaused && !rafId) { lastTick = 0; rafId = requestAnimationFrame(scrollStep); }
+  });
+  document.getElementById('slowerBtn').addEventListener('click', function () {
+    speed = Math.max(15, speed - 10);
+    speedInput.value = speed; speedVal.textContent = speed;
+  });
+  document.getElementById('fasterBtn').addEventListener('click', function () {
+    speed = Math.min(120, speed + 10);
+    speedInput.value = speed; speedVal.textContent = speed;
+  });
+  document.getElementById('backBtn').addEventListener('click', function () {
+    if (recording) return;
+    if (countdownId) { clearInterval(countdownId); countdownId = null; }
+    countdownEl.style.display = 'none';
+    if (rafId) cancelAnimationFrame(rafId);
+    stopStream();
+    show(setupView);
+  });
+  document.getElementById('againBtn').addEventListener('click', function () { startCamera(); });
+  document.getElementById('newBtn').addEventListener('click', function () { show(setupView); });
+})();
+</script>
+</body>
+</html>
